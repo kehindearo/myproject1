@@ -1,8 +1,13 @@
 import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import Trip from "../models/Trip.js";
+import Booking from "../models/Booking.js";
+import User from "../models/User.js";
 import { applySurge } from "../services/pricing.service.js";
 import { getRedis } from "../config/redis.js";
+import { notifyTrustedContactsTripEvent } from "./safetyController.js";
+import { payoutDriverForTrip } from "./driverController.js";
+import { maybeAwardReferralBonus } from "../services/referral.service.js";
 
 const MAX_PRICE_KOBO = 5_000_000; // ₦50,000
 
@@ -107,6 +112,12 @@ export const startTrip = asyncHandler(async (req, res) => {
   trip.status = "active";
   await trip.save();
   req.app.get("io")?.to(`trip:${trip._id}`).emit("trip:status", { tripId: trip._id, status: "active" });
+
+  const bookings = await Booking.find({ trip: trip._id, status: "accepted" }).populate("rider");
+  await Promise.allSettled(
+    bookings.map((b) => notifyTrustedContactsTripEvent(b.rider, trip, "started"))
+  );
+
   res.json({ success: true, trip });
 });
 
@@ -116,5 +127,24 @@ export const endTrip = asyncHandler(async (req, res) => {
   trip.status = "completed";
   await trip.save();
   req.app.get("io")?.to(`trip:${trip._id}`).emit("trip:status", { tripId: trip._id, status: "completed" });
+
+  const bookings = await Booking.find({ trip: trip._id, status: "accepted" }).populate("rider");
+
+  // Release driver earnings (90% of the combined fare, 10% platform commission).
+  const totalFareKobo = bookings.reduce((sum, b) => sum + b.amountKobo, 0);
+  if (totalFareKobo > 0) {
+    const driverUser = await User.findById(trip.driver);
+    if (driverUser) await payoutDriverForTrip(driverUser, totalFareKobo, trip._id);
+  }
+
+  // Mark bookings completed, then fire trusted-contacts SMS + first-trip referral bonuses.
+  await Booking.updateMany({ _id: { $in: bookings.map((b) => b._id) } }, { status: "completed" });
+  await Promise.allSettled(
+    bookings.flatMap((b) => [
+      notifyTrustedContactsTripEvent(b.rider, trip, "ended"),
+      maybeAwardReferralBonus(b.rider),
+    ])
+  );
+
   res.json({ success: true, trip });
 });

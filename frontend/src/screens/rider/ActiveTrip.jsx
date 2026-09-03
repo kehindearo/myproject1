@@ -5,6 +5,7 @@ import { useToast } from "../../components/ui/Toast";
 import { MOCK_TRIPS } from "../../data/mockData";
 import { IconChat, IconShare } from "../../components/ui/icons";
 import SosButton from "../../components/features/SosButton";
+import ChatSheet from "../../components/features/ChatSheet";
 
 const STEPS = ["Driver assigned", "En route to you", "You're in the car", "Arrived"];
 
@@ -18,6 +19,7 @@ export default function ActiveTrip() {
   const [eta, setEta] = useState(8);
   const [fare] = useState(trip.price);
   const [carPos, setCarPos] = useState(20);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -111,10 +113,12 @@ export default function ActiveTrip() {
           padding: 0,
         }}
         aria-label="Chat with driver"
-        onClick={() => show("Chat opens once Socket.io signaling is connected", "info")}
+        onClick={() => setChatOpen(true)}
       >
         <IconChat width={22} height={22} stroke="#fff" />
       </motion.button>
+
+      <ChatSheet open={chatOpen} onClose={() => setChatOpen(false)} tripId={trip.id} peerName={trip.driver.name} />
 
       <motion.div
         initial={{ y: 300 }}

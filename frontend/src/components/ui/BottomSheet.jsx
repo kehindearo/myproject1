@@ -28,9 +28,10 @@ export default function BottomSheet({ open, onClose, children, title }) {
             className="glass"
             style={{
               position: "fixed",
-              left: "50%",
+              left: 0,
+              right: 0,
               bottom: 0,
-              transform: "translateX(-50%)",
+              margin: "0 auto",
               width: "100%",
               maxWidth: "480px",
               borderRadius: "24px 24px 0 0",

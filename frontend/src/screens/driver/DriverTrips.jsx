@@ -4,6 +4,7 @@ import Toggle from "../../components/ui/Toggle";
 import { useToast } from "../../components/ui/Toast";
 import { MOCK_DRIVERS, MOCK_TRIPS } from "../../data/mockData";
 import { IconChat } from "../../components/ui/icons";
+import ChatSheet from "../../components/features/ChatSheet";
 
 const RIDERS = [
   { name: "Chidinma Okeke", avatar: MOCK_DRIVERS[1].avatar, seats: 2, paid: true },
@@ -14,6 +15,7 @@ export default function DriverTrips() {
   const { show } = useToast();
   const [autoAccept, setAutoAccept] = useState(false);
   const [started, setStarted] = useState(false);
+  const [chatWith, setChatWith] = useState(null);
   const trip = MOCK_TRIPS[0];
 
   return (
@@ -50,7 +52,7 @@ export default function DriverTrips() {
             </div>
             <div className="row" style={{ gap: 8 }}>
               <span className={`pill ${r.paid ? "pill-success" : "pill-warning"}`}>{r.paid ? "Paid ✓" : "Pending"}</span>
-              <button className="btn-icon" style={{ width: 36, height: 36 }} onClick={() => show("Chat opens once Socket.io is connected", "info")} aria-label="Chat with rider">
+              <button className="btn-icon" style={{ width: 36, height: 36 }} onClick={() => setChatWith(r)} aria-label={`Chat with ${r.name}`}>
                 <IconChat width={16} height={16} />
               </button>
             </div>
@@ -69,6 +71,8 @@ export default function DriverTrips() {
           </button>
         )}
       </div>
+
+      <ChatSheet open={!!chatWith} onClose={() => setChatWith(null)} tripId={trip.id} peerName={chatWith?.name || "Rider"} />
 
       <BottomNav variant="driver" />
     </div>
