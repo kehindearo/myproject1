@@ -1,0 +1,16 @@
+{
+  "name": "collabo-travel",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Collabo Travel — Your Ride, Your Community. A world-class ride-hailing platform starting in Nigeria, built to scale across Africa and beyond.",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
+    "build:frontend": "npm run build --workspace frontend",
+    "seed:admin": "npm run seed:admin --workspace backend --"
+  }
+}

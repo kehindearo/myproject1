@@ -1,0 +1,13 @@
+{
+  "name": "Collabo Travel — Your Ride, Your Community",
+  "short_name": "Collabo Travel",
+  "description": "Book intercity and city rides with verified drivers across Nigeria and beyond.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1F44",
+  "theme_color": "#0A1F44",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
