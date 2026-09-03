@@ -1,0 +1,12 @@
+{
+  "name": "collabo-travel",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Collabo Travel — Your Ride, Your Community. A world-class ride-hailing platform starting in Nigeria, built to scale across Africa and beyond. frontend/ and backend/ are independent projects (their own package.json, node_modules, lockfile) — no npm workspaces linking, so `npm install` here is a no-op by design.",
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "seed:admin": "npm --prefix backend run seed:admin --"
+  }
+}
